@@ -31,28 +31,34 @@ routerc.post("/api/carts/:cid/products/:pid", async (req, res) => {
 
 
 
-routerc.get("/api/carts/:cid", async (req,res) => {
-    let cid = req.params.cid
+routerc.get("/api/carts/:cid", async (req, res) => {
+    let cid = req.params.cid;
     try {
-        const carrito = await cartManager.getCartByID(cid)
-        const carritoFinal = carrito.Products.map(productos => {
-            const {...rest} = productos.toObject()
-            return rest
-        })
-        if (carrito) {
-            res.render("cart", { 
-                carritoFinal, 
-                carritoID: carrito._id });
-            console.log(carrito)
+        const carrito = await cartManager.getCartByID(cid);
+        if (carrito && carrito.Products && carrito.Products.length > 0) {
+            
+            const carritoFinal = carrito.Products.map(producto => {
+                if (producto) {
+                    const { ...rest } = producto.toObject();
+                    return rest;
+                }
+            });
+             console.log("Carrito final:", carritoFinal);
+            res.render("cart", {
+                carritoFinal,
+                carritoID: carrito._id
+            });
         } else {
-            res.json ( {
-                error: "Producto no encontrado"
-            })
+            res.json({
+                error: "Carrito no encontrado o sin productos"
+            });
         }
     } catch (error) {
-        console.log("no se encontraron productos", error)
+        console.log("No se encontraron productos", error);
+        res.status(500).json({
+            error: "Error al obtener el carrito"
+        });
     }
-
-})
+});
 
 export default routerc

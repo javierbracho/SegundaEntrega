@@ -1,4 +1,5 @@
 import CartModel from "../models/cart.js";
+import ProductModel from "../models/product.js"
 
 class CartManager {
     async cartCreate  () {
@@ -13,19 +14,15 @@ class CartManager {
         }
     }
     async getCartByID(id) {
-    try {
-        const carrito = await CartModel.findById(id).populate('Products.Product');
-        if (!carrito) {
-            console.log("Carrito buscado no existe");
-            return null;
+        try {
+            return await CartModel.findById(id).populate('Products');
+        } catch (error) {
+            console.log("Error al obtener un nuevo carrito", error);
+            throw error;
         }
-        return carrito;
-    } catch (error) {
-        console.log("Error al obtener un nuevo carrito", error);
-        throw error;
     }
-}
-
+    
+    
     async addProductForCart(cartId, productId, Quantity = 1, res) {
         try {
             const carrito = await this.getCartByID(cartId);
@@ -34,21 +31,28 @@ class CartManager {
                 throw new Error("Carrito no encontrado");
             }
     
-            const existeProducto = carrito.Products.find(p => p.Product.toString() === productId);
+            let existeProducto = carrito.Products.find(p => p.Product && p.Product.toString() === productId);
+    
             if (existeProducto) {
                 existeProducto.Quantity += Quantity;
             } else {
-                carrito.Products.push({ Product: productId, Quantity });
+                const product = await ProductModel.findById(productId);
+                if (!product) {
+                    throw new Error("Producto no encontrado");
+                }
+                carrito.Products.push({ Product: product, Quantity });
             }
     
             await carrito.save();
             return carrito;
         } catch (error) {
             console.error("Error al agregar productos:", error.message);
-            res.status(404).json({ error: "Carrito no encontrado" });
+            res.status(404).json({ error: error.message });
             throw error;
         }
     }
+    
+    
     
 }
 
