@@ -31,27 +31,21 @@ class CartManager {
                 throw new Error("Carrito no encontrado");
             }
     
-            let existeProducto = carrito.Products.find(p => p.Product && p.Product.toString() === productId);
-    
+            const existeProducto = carrito.Products.find(p => p.Product.toString() === productId);
             if (existeProducto) {
                 existeProducto.Quantity += Quantity;
             } else {
-                const product = await ProductModel.findById(productId);
-                if (!product) {
-                    throw new Error("Producto no encontrado");
-                }
-                carrito.Products.push({ Product: product, Quantity });
+                carrito.Products.push({ Product: productId, Quantity });
             }
     
             await carrito.save();
             return carrito;
         } catch (error) {
             console.error("Error al agregar productos:", error.message);
-            res.status(404).json({ error: error.message });
+            res.status(404).json({ error: "Carrito no encontrado" });
             throw error;
         }
     }
-    
     
     
 }
