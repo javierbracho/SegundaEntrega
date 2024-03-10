@@ -5,7 +5,7 @@ const router = express.Router()
 const productManager = new ProductManager();
 
 
-router.get("/api/products", async (req, res) => {
+router.get("/products", async (req, res) => {
     try {
         const limit = parseInt(req.query.limit) || undefined;
         const sort = req.query.sort || "";
@@ -43,6 +43,43 @@ router.get("/api/products", async (req, res) => {
     }
 });
 
+router.get("/api/products", async (req, res) => {
+    try {
+        const limit = parseInt(req.query.limit) || undefined;
+        const sort = req.query.sort || "";
+        const category = req.query.category || "";
+        const page = req.query.page || 1; 
+
+        const productos = await productManager.getProducts(sort, category, limit, page); 
+        console.log(productos)
+
+        const productosFinal = productos.docs.map(producto => {
+            const { ...rest } = producto.toObject();
+            return rest
+        });
+
+
+        res.json( {
+            status: "success", // Estado de éxito
+            payload: productosFinal,
+            totalPages: productos.totalPages,
+            prevPages: productos.prevPages,
+            nextPages: productos.nextPages,
+            pages: productos.page,
+            hasPrevPages: productos.hasPrevPage,
+            hasNextPages: productos.hasNextPage,
+            prevLink: productos.prevPage,
+            nextLink: productos.nextPage,
+            limit: productos.limit,
+        });
+    } catch (error) {
+        console.log("Error al buscar productos:", error);
+        res.render("products", {
+            status: "error", // Estado de error
+            error: "Error al buscar productos"
+        });
+    }
+});
 
 
 router.get("/api/products/:pid", async (req, res) => {
