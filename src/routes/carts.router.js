@@ -42,7 +42,7 @@ routerc.get("/api/carts/:cid", async (req, res) => {
                 }
             });
              console.log(carrito);
-            res.json({
+             res.json({
                 carritoFinal,
                 carritoID: carrito._id
             });
