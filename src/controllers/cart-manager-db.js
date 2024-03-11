@@ -70,6 +70,22 @@ class CartManager {
         }
     }
     
+    async vaciarCarrito (cartId) {
+        try {
+            const cart = await CartModel.findByIdAndUpdate(
+                cartId,
+                {produtcs: []},
+                {new: true}
+            )
+            if (!cart){
+                throw new error ("carrito no encontrado")
+            }
+            
+        } catch (error) {
+            console.log("Error al vaciar el carrito")
+            throw error
+        }
+    }
     
     
     
