@@ -129,5 +129,38 @@ routerc.delete("/api/carts/:cid", async (req, res) => {
     }
 });
 
+routerc.put("/api/carts/:cid", async (req, res) => {
+    let cid = req.params.cid;
+    let ActualizarProductos = req.body;
+
+    try {
+        const carrito = await cartManager.updateCart(cid, ActualizarProductos);
+        res.json(carrito)
+        
+    } catch (error) {
+        console.log("error al actualizar carrito", error);
+        res.status(500).json({ message: "error al actualizar carrito" });
+    }
+})
+
+routerc.put("/api/carts/:cid/product/:pid", async (req,res) => {
+    try {
+        let cid = req.params.cid;
+        let pid = req.params.pid;
+        let newQuantity = req.body.Quantity;
+    
+        const actualizarCarrito = await cartManager.updateQuantityProduct(cid, pid, newQuantity)
+        res.json ({
+            status: "success",
+            message: "Cantidad actualizado en producto, correctamente",
+            actualizarCarrito,
+        })
+        
+    } catch (error) {
+        console.log("error al actualizar carrito", error);
+        res.status(500).json({ message: "error al actualizar carrito" });
+    }
+})
+
 
 export default routerc

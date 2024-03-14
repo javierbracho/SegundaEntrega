@@ -21,6 +21,46 @@ class CartManager {
             throw error;
         }
     }
+
+
+    async updateCart (cartId, ActualizarProductos) {
+        try {
+            const cart = await CartModel.findById(cartId)
+                if(!cart) {
+                    throw new error ("carrito no encontrado")
+                }
+
+                cart.Products = ActualizarProductos;
+                cart.markModified("Products");
+                await cart.save();
+                return cart
+        } catch (error) {
+            console.error ("Error al actualizar carrito", error);
+            throw error
+        }
+    }
+
+    async updateQuantityProduct (cartId, productId, newQuantity) {
+        try {
+            const carrito = await CartModel.findById(cartId)
+            const existeProducto = carrito.Products.find(p => p._id.toString() === productId);
+            if(existeProducto) {
+                existeProducto.Quantity = newQuantity
+            }
+            carrito.markModified('Products')
+            await carrito.save()
+            return carrito
+        } catch (error) {
+            console.error("Error al agregar cantidades al producto:", error.message);
+            res.status(404).json({ error: "error en el servidor" });
+            throw error;
+        }
+    }
+
+
+
+
+
     
     
     async addProductForCart(cartId, productId, Quantity = 1, res) {
@@ -46,6 +86,11 @@ class CartManager {
             throw error;
         }
     }
+
+
+
+
+
 
     async deleteProductForCart(cartId, productId, res) {
         try {
