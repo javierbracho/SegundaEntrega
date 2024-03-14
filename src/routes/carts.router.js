@@ -29,6 +29,36 @@ routerc.post("/api/carts/:cid/products/:pid", async (req, res) => {
     }
 });
 
+routerc.get("/carts/:cid", async (req, res) => {
+    let cid = req.params.cid;
+    try {
+        const carrito = await cartManager.getCartByID(cid);
+        if (carrito && carrito.Products && carrito.Products.length > 0) {
+            const carritoFinal = carrito.Products.map(producto => {
+                if (producto) {
+                    const { ...rest } = producto.toObject();
+                    return rest;
+                }
+            });
+             console.log(carrito);
+            res.render("cart", {
+                carritoFinal,
+                carritoID: carrito._id
+            });
+        } else {
+            res.json({
+                error: "Carrito no encontrado o sin productos"
+            });
+        }
+    } catch (error) {
+        console.log("No se encontraron productos", error);
+        res.status(500).json({
+            error: "Error al obtener el carrito"
+        });
+    }
+})    
+
+
 routerc.get("/api/carts/:cid", async (req, res) => {
     let cid = req.params.cid;
     try {
@@ -58,34 +88,6 @@ routerc.get("/api/carts/:cid", async (req, res) => {
         });
     }
 
-routerc.get("/carts/:cid", async (req, res) => {
-    let cid = req.params.cid;
-    try {
-        const carrito = await cartManager.getCartByID(cid);
-        if (carrito && carrito.Products && carrito.Products.length > 0) {
-            const carritoFinal = carrito.Products.map(producto => {
-                if (producto) {
-                    const { ...rest } = producto.toObject();
-                    return rest;
-                }
-            });
-             console.log(carrito);
-            res.render("cart", {
-                carritoFinal,
-                carritoID: carrito._id
-            });
-        } else {
-            res.json({
-                error: "Carrito no encontrado o sin productos"
-            });
-        }
-    } catch (error) {
-        console.log("No se encontraron productos", error);
-        res.status(500).json({
-            error: "Error al obtener el carrito"
-        });
-    }
-})    
 
 routerc.delete("/api/carts/:cid/products/:pid", async (req, res) => {
     let cid = req.params.cid;

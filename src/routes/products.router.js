@@ -86,6 +86,8 @@ router.get("/api/products/:pid", async (req, res) => {
     let pid = req.params.pid
     try {
         const producto = await productManager.getProductById(pid);
+        const productos = await productManager.getProducts()
+        console.log(productos)
         if (producto) {
             res.json(producto)
         } else {

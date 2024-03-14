@@ -22,7 +22,6 @@ class CartManager {
         }
     }
 
-
     async updateCart (cartId, ActualizarProductos) {
         try {
             const cart = await CartModel.findById(cartId)
