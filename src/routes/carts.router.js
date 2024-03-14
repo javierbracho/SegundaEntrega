@@ -105,4 +105,29 @@ routerc.delete("/api/carts/:cid/products/:pid", async (req, res) => {
     });
 });
 
+routerc.delete("/api/carts/:cid", async (req, res) => {
+    let cid = req.params.cid;
+    try {
+        const carrito = await cartManager.vaciarCarrito(cid);
+        if (carrito) {
+            res.json({
+                status: "success",
+                message: "Carrito eliminado",
+                carrito
+            });
+            
+        } else {
+            res.json({
+                status: "Fail",
+                message: "Error al eliminar el carrito"
+            });
+            console.log("Error al cargar el carrito");
+        }
+    } catch (error) {
+        console.log("error al eliminar carrito", error);
+        res.status(500).json({ message: "error al eliminar carrito" });
+    }
+});
+
+
 export default routerc
